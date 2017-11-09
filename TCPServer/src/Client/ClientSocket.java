@@ -3,6 +3,8 @@ package Client;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -15,6 +17,7 @@ import TCP.Operation;
 public class ClientSocket {
 	public Socket m_SocketToServer = null;
 	public ServerSocket m_serverSocket = null;
+	public DatagramSocket m_fileServer = null;
 	public ObjectOutputStream m_objOutputStream = null;
 	public ObjectInputStream m_objInputStream = null;
 	public Operation m_operationObj = null;
@@ -25,6 +28,7 @@ public class ClientSocket {
 		try {
 			m_SocketToServer = new Socket("localhost", 8088);
 			m_serverSocket = new ServerSocket(0);
+			m_fileServer = new DatagramSocket(0);
 			m_objOutputStream = new ObjectOutputStream(m_SocketToServer.getOutputStream());
 			m_objInputStream = new ObjectInputStream(m_SocketToServer.getInputStream());
 		} catch (UnknownHostException e) {
@@ -161,6 +165,26 @@ public class ClientSocket {
 				}
 			}
 			
+		}
+	}
+	
+	
+	private class FileServerThread extends Thread{
+		@Override
+		public void run(){
+			while(true)
+			{
+				byte[] buf=new byte[1024];
+		        DatagramPacket packet=new DatagramPacket(buf, buf.length);
+		        System.out.println("I am waiting.");
+		        try {
+					m_fileServer.receive(packet);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		        byte[] mess=packet.getData();
+			}
 		}
 	}
 	

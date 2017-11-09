@@ -8,6 +8,8 @@ import java.awt.Image;
 import java.awt.List;
 import java.awt.Toolkit;
 import java.awt.color.ColorSpace;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -21,6 +23,7 @@ import java.util.HashMap;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -31,6 +34,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.TransferHandler;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.xml.crypto.dsig.SignedInfo;
@@ -307,7 +311,6 @@ public class ContactWindow extends JFrame {
                      }   
                  }   
              });   
-			
 			
 			m_operationPanel.setLayout(null);
 			m_operationPanel.setBackground(new Color(0xFFFFFF));
