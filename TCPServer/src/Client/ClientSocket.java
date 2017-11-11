@@ -1,5 +1,6 @@
 package Client;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -24,6 +25,8 @@ public class ClientSocket {
 	public HashMap m_otherClientSocketMap = new HashMap<String, OtherClientSocketInfo>();
 	public LoginWindow m_loginWindow = null;
 	public ContactWindow m_contaContactWindow = null;
+	public File m_sendFile = null;
+	public String m_receiveFileName = null;
 	public boolean Init() {
 		try {
 			m_SocketToServer = new Socket("localhost", 8088);
@@ -206,6 +209,13 @@ public class ClientSocket {
 		}
 	}
 	
+	private class SendFileThread extends Thread{
+		@Override
+		public void run(){
+			
+		}
+	}
+	
 	//接收其他客户端消息的线程
 	private class ReceiveOtherClient extends Thread{
 		Socket m_otherClientSocket = null;
@@ -233,6 +243,47 @@ public class ClientSocket {
 					if(operation.m_operationName.equals("onlineChatWithOtherClient"))
 					{
 						m_contaContactWindow.AddMsg(operation.m_user, operation.m_msg);
+					}
+					else if(operation.m_operationName.equals("sendFileReq"))
+					{
+						m_contaContactWindow.AddMsg(operation.m_user, operation.m_msg);
+						if(m_contaContactWindow.m_fileTransState)
+						{
+							Operation operation2 = new Operation();
+							operation.m_operationName = "sendFileRsp";
+							operation.m_user = m_contaContactWindow.m_user;
+							operation.m_msg = "another file is transferring, please wait..";
+							SendMessageToOtherClient(operation.m_user, operation2);
+						}
+						else
+						{
+							Operation operation2 = new Operation();
+							operation.m_operationName = "sendFileRsp";
+							operation.m_user = m_contaContactWindow.m_user;
+							int ret = JOptionPane.showConfirmDialog(null, operation.m_user + "want to send file " + operation.m_fileName + ", are you sure to receive", "tips", JOptionPane.YES_NO_OPTION);
+				            if(ret == 0)
+				            {
+				            	m_contaContactWindow.m_fileTransState = true;
+				            	operation.m_msg = "agreeFileTrans";
+				            	m_receiveFileName = operation.m_fileName;
+				            }
+				            else
+				            {
+				            	operation.m_msg = m_contaContactWindow.m_user + " refused to accept the file";
+				            }
+							SendMessageToOtherClient(operation.m_user, operation2);
+						}
+					}
+					else if(operation.m_operationName.equals("sendFileRsp"))
+					{
+						if(operation.m_msg.equals("agreeFileTrans"))
+						{
+							
+						}
+						else
+						{
+							JOptionPane.showConfirmDialog(null, operation.m_msg, "tips", JOptionPane.INFORMATION_MESSAGE);
+						}
 					}
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
